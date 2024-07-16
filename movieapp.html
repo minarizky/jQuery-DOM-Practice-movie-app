@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movies App</title>
+  <link rel="stylesheet"
+        href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+</head>
+<body>
+<div class="container">
+  <h1 class="text-center">Movies App</h1>
+  <form id="movie-form">
+    <div class="form-group">
+      <label for="title">Movie Title:</label>
+      <input type="text" id="title" class="form-control">
+    </div>
+    <div class="form-group">
+      <label for="rating">Rating:</label>
+      <input type="number" id="rating" class="form-control" min="0" max="10">
+    </div>
+    <button type="submit" class="btn btn-primary">Add Movie</button>
+  </form>
+  <hr>
+  <h2>Movie List</h2>
+  <ul id="movie-list" class="list-group">
+  </ul>
+  <button id="sort-title" class="btn btn-secondary mt-3">Sort by Title</button>
+  <button id="sort-rating" class="btn btn-secondary mt-3">Sort by Rating</button>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script>
+  $(document).ready(function() {
+    $("#movie-form").on("submit", function(event) {
+      event.preventDefault();
+      
+      const title = $("#title").val().trim();
+      const rating = $("#rating").val();
+      
+      if (title.length < 2 || rating < 0 || rating > 10) {
+        alert("Please enter a valid title and rating (0-10).");
+        return;
+      }
+      
+      const movieItem = `<li class="list-group-item d-flex justify-content-between align-items-center">
+        ${title} - Rating: ${rating}
+        <button class="btn btn-danger btn-sm remove">Remove</button>
+      </li>`;
+      
+      $("#movie-list").append(movieItem);
+      $("#title").val("");
+      $("#rating").val("");
+    });
+    
+    $("#movie-list").on("click", ".remove", function() {
+      $(this).parent().remove();
+    });
+    
+    $("#sort-title").on("click", function() {
+      sortMovies("title");
+    });
+    
+    $("#sort-rating").on("click", function() {
+      sortMovies("rating");
+    });
+    
+    function sortMovies(criteria) {
+      let movies = $("#movie-list li").toArray();
+      movies.sort(function(a, b) {
+        let textA = $(a).text().split(" - Rating: ");
+        let textB = $(b).text().split(" - Rating: ");
+        let valA = criteria === "title" ? textA[0].toLowerCase() : parseInt(textA[1]);
+        let valB = criteria === "title" ? textB[0].toLowerCase() : parseInt(textB[1]);
+        
+        if (valA < valB) return -1;
+        if (valA > valB) return 1;
+        return 0;
+      });
+      $("#movie-list").empty().append(movies);
+    }
+  });
+</script>
+</body>
+</html>
